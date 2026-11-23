@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <!-- Denne linjen gjør at siden tilpasser seg mobilskjermer -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mine juleønsker</title>
+  <meta name="description" content="Ønskelisten min for jula.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐿️</text></svg>">
+
+  <!-- Skrifttyper fra Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@400;600;700&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       Juleønsker – stil
+       Fargene er samlet her øverst, så de er lette å endre.
+       ========================================================= */
+
+    :root {
+      --natt: #162640;        /* kveldshimmel */
+      --sno: #F3F6F9;         /* snø */
+      --julerod: #B8322E;
+      --gran: #2F5D3A;
+      --lampe: #F2B84B;       /* gult lys fra vinduer */
+      --treverk: #4A2F26;     /* mørk brun, brukes til tekst */
+      --hyssing: #8E6A4A;     /* snora lappene henger i */
+      --dempet: #5E6B7A;
+
+      --font-tittel: "Mountains of Christmas", Georgia, "Times New Roman", serif;
+      --font-tekst: "Grandstander", "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: light;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--sno);
+      color: var(--treverk);
+      font-family: var(--font-tekst);
+      font-size: 1.0625rem;
+      line-height: 1.55;
+    }
+
+    /* ---------- Header ---------- */
+
+    .topp {
+      position: relative;
+      overflow: hidden;
+      background: var(--natt);
+      color: var(--sno);
+      text-align: center;
+    }
+
+    .sno {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .topp-tekst {
+      position: relative;
+      z-index: 1;
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: clamp(2.5rem, 7vw, 4.5rem) 1.25rem 0;
+    }
+
+    .topp h1 {
+      display: inline-block;
+      margin: 0;
+      font-family: var(--font-tittel);
+      font-weight: 700;
+      font-size: clamp(2.75rem, 10vw, 5.75rem);
+      line-height: 1.05;
+      transform: rotate(-2deg);
+      /* Rød «utskåret» skygge, som på gamle tegnefilmplakater */
+      text-shadow:
+        0 3px 0 var(--julerod),
+        0 6px 0 #7A1F1C,
+        0 10px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .topp p {
+      max-width: 30rem;
+      margin: 1.1rem auto 0;
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      color: #DCE6F0;
+    }
+
+    .scene {
+      display: block;
+      width: 100%;
+      /* Mobil: minst 320px høy, så ekornet ikke blir for lite.
+         Store skjermer: maks 720px. */
+      height: clamp(320px, 46vw, 720px);
+    }
+
+    /* Mobil og smale skjermer: bildet blir større og skyves opp bak
+       tittelen, så ekornet og kjelken får mer plass. */
+    @media (max-width: 700px) {
+      .topp-tekst {
+        padding-top: 2.25rem;
+      }
+
+      .scene {
+        height: 420px;
+        margin-top: -140px;
+      }
+    }
+
+    /* ---------- Ønskelisten ---------- */
+
+    .onskeliste {
+      max-width: 66rem;
+      margin: 0 auto;
+      padding: clamp(0.5rem, 2vw, 1.5rem) 1.25rem 4rem;
+    }
+
+    .intro {
+      max-width: 34rem;
+      margin: 0 auto 1.75rem;
+      text-align: center;
+      color: var(--dempet);
+    }
+
+    .onsker {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      /* Så mange kolonner som får plass. På mobil blir det én. */
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+      gap: 2.5rem 2rem;
+      justify-items: center;
+    }
+
+    .onske {
+      --vipp: 0deg;
+      position: relative;
+      width: 100%;
+      max-width: 20rem;
+      padding-top: 44px;
+      transform: rotate(var(--vipp));
+      transform-origin: 50% 0;
+      filter: drop-shadow(0 6px 0 rgba(22, 38, 64, 0.13));
+    }
+
+    /* Hver lapp henger litt skjevt, på forskjellig vis */
+    .onske:nth-child(3n + 1) { --vipp: -2.5deg; }
+    .onske:nth-child(3n + 2) { --vipp: 1.5deg; }
+    .onske:nth-child(3n)     { --vipp: -1deg; }
+
+    /* Snora */
+    .onske::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      z-index: 2;
+      width: 2px;
+      height: 65px;
+      margin-left: -1px;
+      border-radius: 2px;
+      background: var(--hyssing);
+    }
+
+    /* Den lille røde knuten øverst */
+    .onske::after {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      margin-left: -6px;
+      border-radius: 50%;
+      background: var(--julerod);
+      box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.22);
+    }
+
+    .lapp {
+      --lapp-bg: var(--julerod);
+      --lapp-tekst: #FFF8EE;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-height: 10rem;
+      padding: 2.5rem 1.4rem 1.3rem;
+      background: var(--lapp-bg);
+      color: var(--lapp-tekst);
+      text-decoration: none;
+      /* Klassisk pakkelapp-form med avskårne hjørner øverst */
+      clip-path: polygon(16% 0, 84% 0, 100% 20%, 100% 100%, 0 100%, 0 20%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Hullet snora går gjennom */
+    .lapp::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      margin-left: -7px;
+      border-radius: 50%;
+      background: var(--sno);
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.18);
+    }
+
+    .onske:nth-child(3n + 2) .lapp {
+      --lapp-bg: var(--gran);
+    }
+
+    .onske:nth-child(3n) .lapp {
+      --lapp-bg: var(--lampe);
+      --lapp-tekst: var(--treverk);
+    }
+
+    .lapp-tittel {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .lapp-tekst {
+      font-size: 0.98rem;
+    }
+
+    .lapp-lenke {
+      margin-top: auto;
+      padding-top: 0.6rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.2em;
+    }
+
+    .lapp:active {
+      filter: brightness(0.93);
+    }
+
+    /* Tydelig markering når man navigerer med tastatur (Tab-tasten) */
+    .onske:has(.lapp:focus-visible) {
+      outline: 3px dashed var(--natt);
+      outline-offset: 8px;
+      border-radius: 6px;
+    }
+
+    .lapp:focus-visible {
+      outline: none;
+    }
+
+    /* Lappen svaier når musa holdes over (bare på enheter med mus) */
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      .onske:hover {
+        animation: svai 1.2s ease-in-out;
+      }
+    }
+
+    @keyframes svai {
+      0%   { transform: rotate(var(--vipp)); }
+      25%  { transform: rotate(calc(var(--vipp) + 4deg)); }
+      55%  { transform: rotate(calc(var(--vipp) - 3deg)); }
+      80%  { transform: rotate(calc(var(--vipp) + 1.5deg)); }
+      100% { transform: rotate(var(--vipp)); }
+    }
+
+    /* Tekst som bare skjermlesere leser opp */
+    .skjult {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* ---------- Bunnen ---------- */
+
+    .bunn {
+      padding: 1rem 1.25rem 3rem;
+      text-align: center;
+      color: var(--dempet);
+    }
+
+    .bunn-hilsen {
+      margin: 0;
+      font-family: var(--font-tittel);
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--julerod);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topp">
+    <canvas class="sno" aria-hidden="true"></canvas>
+    <div class="topp-tekst">
+      <!-- ENDRE: tittel og undertekst -->
+      <h1>Mine juleønsker</h1>
+      <p>Ekornet har pakket kjelken. Her er det jeg ønsker meg i år.</p>
+    </div>
+    <!-- Headergrafikken (tegnet med SVG). Du trenger ikke endre noe her. -->
+    <svg class="scene" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" role="img" aria-label="Et ekorn med strikkelue drar en kjelke full av julegaver gjennom en snødekt småby om kvelden." xmlns:c2pa="http://c2pa.org/manifest">
+      <defs>
+        <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#162640"/>
+          <stop offset="0.42" stop-color="#162640"/>
+          <stop offset="1" stop-color="#3A5A86"/>
+        </linearGradient>
+        <radialGradient id="glod">
+          <stop offset="0" stop-color="#F2B84B" stop-opacity="0.55"/>
+          <stop offset="1" stop-color="#F2B84B" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="maaneglod">
+          <stop offset="0" stop-color="#FFF3D1" stop-opacity="0.45"/>
+          <stop offset="1" stop-color="#FFF3D1" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Et hus. Veggfargen styres med color="..." der huset brukes. -->
+        <symbol id="hus" viewBox="0 0 160 170" overflow="visible">
+          <circle cx="45" cy="119" r="42" fill="url(#glod)"/>
+          <circle cx="115" cy="119" r="42" fill="url(#glod)"/>
+          <path d="M10 170 L16 80 Q80 72 144 82 L150 170 Z" fill="currentColor"/>
+          <rect x="108" y="20" width="18" height="50" fill="#6B4A3A"/>
+          <rect x="104" y="14" width="26" height="10" rx="5" fill="#F3F6F9"/>
+          <path d="M0 88 L80 10 L160 90 Z" fill="#4A2F26"/>
+          <path d="M36 88 L80 34 L124 90 Z" fill="currentColor"/>
+          <path d="M36 88 L80 34 L124 90 Z" fill="#000" opacity="0.12"/>
+          <path d="M-4 90 C4 78 14 80 22 74 L80 4 L138 76 C146 80 156 78 164 92 C156 98 148 90 142 94 C138 102 128 98 126 90 L80 32 L36 88 C32 100 20 100 18 92 C10 98 0 98 -4 90 Z" fill="#F3F6F9"/>
+          <circle cx="80" cy="66" r="9" fill="#F2B84B" stroke="#4A2F26" stroke-width="2"/>
+          <rect x="30" y="104" width="30" height="30" rx="4" fill="#F2B84B"/>
+          <rect x="100" y="104" width="30" height="30" rx="4" fill="#F2B84B"/>
+          <path d="M45 104 V134 M30 119 H60 M115 104 V134 M100 119 H130" stroke="#4A2F26" stroke-width="3"/>
+          <rect x="26" y="132" width="38" height="6" rx="3" fill="#F3F6F9"/>
+          <rect x="96" y="132" width="38" height="6" rx="3" fill="#F3F6F9"/>
+          <path d="M66 170 L66 134 Q80 120 94 134 L94 170 Z" fill="#4A2F26"/>
+          <circle cx="89" cy="152" r="2" fill="#F2B84B"/>
+        </symbol>
+
+        <!-- Et grantre med snø -->
+        <symbol id="gran" viewBox="0 0 80 140" overflow="visible">
+          <rect x="34" y="116" width="12" height="24" fill="#4A2F26"/>
+          <path d="M40 0 L62 40 L52 40 L70 76 L58 76 L78 118 L2 118 L22 76 L10 76 L28 40 L18 40 Z" fill="#234A31"/>
+          <path d="M40 0 L50 18 Q40 24 30 18 Z" fill="#F3F6F9"/>
+          <path d="M18 40 Q30 46 40 40 Q50 46 62 40 Q52 34 40 36 Q28 34 18 40 Z" fill="#F3F6F9"/>
+          <path d="M10 76 Q24 84 40 76 Q56 84 70 76 Q56 69 40 72 Q24 69 10 76 Z" fill="#F3F6F9"/>
+          <path d="M2 118 Q20 126 40 118 Q60 126 78 118 Q60 110 40 113 Q20 110 2 118 Z" fill="#F3F6F9"/>
+        </symbol>
+      </defs>
+
+      <!-- Himmel -->
+      <rect width="1200" height="600" fill="url(#himmel)"/>
+
+      <!-- Stjerner -->
+      <g fill="#FBF3D9">
+        <circle cx="60" cy="40" r="1.6" opacity="0.8"/>
+        <circle cx="140" cy="120" r="1.2" opacity="0.6"/>
+        <circle cx="210" cy="60" r="2" opacity="0.9"/>
+        <circle cx="300" cy="150" r="1.3" opacity="0.6"/>
+        <circle cx="350" cy="35" r="1.5" opacity="0.8"/>
+        <circle cx="430" cy="100" r="1.1" opacity="0.5"/>
+        <circle cx="480" cy="190" r="1.6" opacity="0.7"/>
+        <circle cx="540" cy="55" r="1.3" opacity="0.7"/>
+        <circle cx="620" cy="130" r="1.8" opacity="0.8"/>
+        <circle cx="690" cy="30" r="1.2" opacity="0.6"/>
+        <circle cx="740" cy="210" r="1.4" opacity="0.6"/>
+        <circle cx="800" cy="90" r="1.9" opacity="0.9"/>
+        <circle cx="870" cy="170" r="1.2" opacity="0.5"/>
+        <circle cx="900" cy="45" r="1.5" opacity="0.7"/>
+        <circle cx="1100" cy="60" r="1.4" opacity="0.7"/>
+        <circle cx="1150" cy="180" r="1.8" opacity="0.8"/>
+        <circle cx="1070" cy="230" r="1.2" opacity="0.5"/>
+        <circle cx="250" cy="230" r="1.3" opacity="0.5"/>
+        <circle cx="100" cy="250" r="1.6" opacity="0.6"/>
+        <circle cx="560" cy="250" r="1.2" opacity="0.5"/>
+      </g>
+      <!-- Små firetakkede stjerner -->
+      <g fill="#FFF3D1">
+        <path d="M210 52 L212 60 L220 62 L212 64 L210 72 L208 64 L200 62 L208 60 Z" opacity="0.9"/>
+        <path d="M800 80 L802 88 L810 90 L802 92 L800 100 L798 92 L790 90 L798 88 Z" opacity="0.9"/>
+        <path d="M480 180 L481.5 186 L488 188 L481.5 190 L480 196 L478.5 190 L472 188 L478.5 186 Z" opacity="0.7"/>
+      </g>
+
+      <!-- Måne -->
+      <circle cx="1010" cy="200" r="85" fill="url(#maaneglod)"/>
+      <circle cx="1010" cy="200" r="40" fill="#FFF3D1"/>
+      <circle cx="997" cy="188" r="7" fill="#EFE0B5"/>
+      <circle cx="1023" cy="212" r="10" fill="#EFE0B5"/>
+      <circle cx="1019" cy="180" r="4.5" fill="#EFE0B5"/>
+
+      <!-- Åser langt borte -->
+      <path d="M0 360 Q150 300 320 340 T640 320 T960 335 T1200 315 L1200 600 L0 600 Z" fill="#7E97B5"/>
+      <g fill="#2A4560">
+        <path d="M90 340 L100 316 L110 340 Z"/>
+        <path d="M110 342 L118 324 L126 342 Z"/>
+        <path d="M700 330 L710 306 L720 330 Z"/>
+        <path d="M722 332 L730 314 L738 332 Z"/>
+        <path d="M1090 330 L1100 304 L1110 330 Z"/>
+      </g>
+      <path d="M0 410 Q200 370 420 395 T820 385 T1200 395 L1200 600 L0 600 Z" fill="#B9CADB"/>
+
+      <!-- Kirke på åsen -->
+      <g>
+        <rect x="590" y="300" width="22" height="60" fill="#E2CFA6"/>
+        <path d="M586 302 L601 258 L616 302 Z" fill="#4A2F26"/>
+        <path d="M586 302 L601 258 L606 272 Q598 280 592 296 Z" fill="#F3F6F9"/>
+        <circle cx="601" cy="252" r="4" fill="#F2B84B"/>
+        <circle cx="601" cy="320" r="5" fill="#F2B84B"/>
+        <rect x="566" y="350" width="70" height="44" fill="#E2CFA6"/>
+        <path d="M560 354 L601 330 L642 354 Z" fill="#4A2F26"/>
+        <path d="M558 355 Q580 340 601 328 Q622 340 644 355 Q630 352 622 348 Q610 346 601 340 Q590 346 580 348 Q570 352 558 355 Z" fill="#F3F6F9"/>
+        <rect x="578" y="364" width="10" height="16" rx="5" fill="#F2B84B"/>
+        <rect x="614" y="364" width="10" height="16" rx="5" fill="#F2B84B"/>
+      </g>
+
+      <!-- Trær bak husene -->
+      <use href="#gran" x="20" y="340" width="70" height="122"/>
+      <use href="#gran" x="245" y="362" width="50" height="88"/>
+      <use href="#gran" x="770" y="352" width="56" height="98"/>
+      <use href="#gran" x="1150" y="332" width="70" height="122"/>
+
+      <!-- Hus -->
+      <use href="#hus" x="270" y="332" width="128" height="136" color="#2F5D3A"/>
+      <use href="#hus" x="80" y="302" width="160" height="170" color="#A8322F"/>
+      <use href="#hus" x="820" y="318" width="144" height="153" color="#D9C394"/>
+      <use href="#hus" x="990" y="300" width="160" height="170" color="#3E6E8E"/>
+
+      <!-- Røyk fra pipene -->
+      <g fill="#DDE5EE" opacity="0.45">
+        <circle cx="200" cy="296" r="8"/>
+        <circle cx="210" cy="276" r="11"/>
+        <circle cx="226" cy="250" r="14"/>
+        <circle cx="1110" cy="294" r="8"/>
+        <circle cx="1120" cy="274" r="11"/>
+        <circle cx="1136" cy="248" r="14"/>
+      </g>
+
+      <!-- Trær foran husene -->
+      <use href="#gran" x="410" y="342" width="66" height="116"/>
+      <use href="#gran" x="958" y="348" width="60" height="105"/>
+
+      <!-- Snø i forgrunnen -->
+      <path d="M0 478 C150 458 300 472 450 470 S750 462 900 472 S1100 466 1200 474 L1200 600 L0 600 Z" fill="#F3F6F9"/>
+      <path d="M0 522 C200 506 400 530 620 516 S1000 530 1200 512 L1200 540 C1000 552 700 535 400 548 S100 540 0 548 Z" fill="#DCE5EE" opacity="0.7"/>
+
+      <!-- Kjelkespor -->
+      <g fill="none" stroke="#C6D4E2" stroke-width="3" stroke-linecap="round">
+        <path d="M-10 566 C150 548 320 522 470 509"/>
+        <path d="M-10 580 C150 562 330 534 480 520"/>
+      </g>
+
+      <!-- Kjelke med gaver -->
+      <ellipse cx="548" cy="514" rx="86" ry="7" fill="#C6D4E2"/>
+      <rect x="492" y="490" width="6" height="16" fill="#4A2F26"/>
+      <rect x="572" y="490" width="6" height="16" fill="#4A2F26"/>
+      <path d="M468 506 L598 506 C625 506 628 480 610 478" fill="none" stroke="#4A2F26" stroke-width="5" stroke-linecap="round"/>
+      <rect x="476" y="482" width="128" height="12" rx="5" fill="#8E5A35"/>
+      <path d="M484 486 H596" stroke="#B07A4E" stroke-width="2" stroke-linecap="round"/>
+
+      <rect x="538" y="438" width="56" height="44" rx="2" fill="#2F5D3A"/>
+      <rect x="562" y="438" width="8" height="44" fill="#F2B84B"/>
+      <rect x="538" y="455" width="56" height="8" fill="#F2B84B"/>
+
+      <rect x="484" y="426" width="50" height="56" rx="2" fill="#B8322E"/>
+      <rect x="505" y="426" width="8" height="56" fill="#F3F6F9"/>
+      <rect x="484" y="450" width="50" height="8" fill="#F3F6F9"/>
+
+      <g transform="rotate(-8 518 410)">
+        <rect x="498" y="394" width="40" height="32" rx="2" fill="#F2B84B"/>
+        <rect x="514" y="394" width="7" height="32" fill="#B8322E"/>
+        <rect x="498" y="406" width="40" height="7" fill="#B8322E"/>
+        <ellipse cx="510" cy="391" rx="9" ry="5" fill="#B8322E" transform="rotate(-25 510 391)"/>
+        <ellipse cx="526" cy="391" rx="9" ry="5" fill="#B8322E" transform="rotate(25 526 391)"/>
+        <circle cx="518" cy="393" r="3.5" fill="#8E2420"/>
+      </g>
+      <ellipse cx="575" cy="437" rx="8" ry="5" fill="#F2B84B" transform="rotate(-20 575 437)"/>
+      <ellipse cx="590" cy="437" rx="8" ry="5" fill="#F2B84B" transform="rotate(20 590 437)"/>
+
+      <!-- Tau fra kjelken til ekornet -->
+      <path d="M612 478 Q675 492 746 457" fill="none" stroke="#8E6A4A" stroke-width="3" stroke-linecap="round"/>
+
+      <!-- Ekornet -->
+      <g transform="translate(735 508)">
+        <!-- skygge -->
+        <ellipse cx="4" cy="4" rx="40" ry="6" fill="#C6D4E2"/>
+        <!-- hale -->
+        <path d="M-18 -30 C-70 -26 -96 -80 -78 -122 C-64 -156 -18 -160 -12 -132 C-8 -112 -32 -106 -40 -118 C-44 -96 -36 -70 -6 -58 Z" fill="#D27A3C" stroke="#9A4F22" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M-28 -44 C-62 -52 -78 -92 -66 -120 C-58 -136 -38 -142 -28 -130" fill="none" stroke="#E9A56A" stroke-width="6" stroke-linecap="round"/>
+        <!-- bakfot -->
+        <ellipse cx="-10" cy="-5" rx="14" ry="7" fill="#8E4520"/>
+        <!-- kropp -->
+        <ellipse cx="2" cy="-40" rx="30" ry="38" fill="#C2672B"/>
+        <ellipse cx="12" cy="-36" rx="17" ry="26" fill="#F3DDB8"/>
+        <!-- forfot -->
+        <ellipse cx="20" cy="-4" rx="15" ry="7" fill="#8E4520"/>
+        <!-- skjerf-ende som blafrer bakover -->
+        <path d="M2 -66 C-16 -66 -28 -56 -44 -62 L-40 -49 C-26 -45 -12 -54 2 -56 Z" fill="#2F5D3A"/>
+        <path d="M-22 -60 L-20 -50 M-32 -59 L-31 -49" stroke="#F2B84B" stroke-width="3" stroke-linecap="round"/>
+        <!-- hode -->
+        <circle cx="18" cy="-92" r="28" fill="#C2672B"/>
+        <ellipse cx="38" cy="-84" rx="15" ry="11" fill="#F3DDB8"/>
+        <ellipse cx="51" cy="-88" rx="5" ry="4" fill="#3A2418"/>
+        <path d="M38 -78 Q44 -73 50 -78" fill="none" stroke="#3A2418" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="28" cy="-97" rx="5.5" ry="7.5" fill="#2A1A12"/>
+        <circle cx="30" cy="-100" r="2" fill="#FFFFFF"/>
+        <circle cx="23" cy="-82" r="6" fill="#E88A7A" opacity="0.55"/>
+        <!-- strikkelue -->
+        <path d="M-8 -110 C-6 -142 40 -148 46 -112 Z" fill="#B8322E"/>
+        <path d="M6 -138 Q12 -126 14 -114 M24 -141 Q26 -128 26 -116" fill="none" stroke="#8E2420" stroke-width="2" stroke-linecap="round"/>
+        <path d="M-10 -112 Q18 -122 48 -112 L48 -104 Q18 -114 -10 -104 Z" fill="#F3F6F9"/>
+        <circle cx="4" cy="-142" r="9" fill="#F3F6F9"/>
+        <!-- skjerf rundt halsen -->
+        <path d="M-2 -70 Q20 -62 42 -72 L40 -60 Q20 -52 0 -58 Z" fill="#2F5D3A"/>
+        <!-- arm som holder tauet -->
+        <path d="M-4 -60 Q0 -46 10 -50" fill="none" stroke="#B35D25" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="11" cy="-51" r="6" fill="#8E4520"/>
+      </g>
+    <metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYToxZTY3NTZiYS0zNWZjLTRkZmEtYTUwOS0xOWJlZDkzOTVjMmQAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaJ/sBPuu4bc5yZ7VvdL/RgoAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo5NTU0YzgyZS1mYzM2LTRhNzYtYjFhYS1iNjk4ODRlN2EyN2JscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNorGJ9xunAVM05outclE3/vAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggeCrCU23txTlCwr3O3a/3oCSSPx8KIgjpieokOPxCOG+kZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaFaulkjg+NvrK89bjixRZh0AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIJPZzUE8itk9mLE+1XCIx1u6VaSSS3fge3R4gl/koU/2ZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GS1mZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjFlNjc1NmJhLTM1ZmMtNGRmYS1hNTA5LTE5YmVkOTM5NWMyZC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmE2NGM4Yjc0LWVkNWYtNDUyZS1iY2FmLTg4Yjk0ZTY0YTI3ZXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCB4KsJTbe3FOULCvc7dr/egJJI/HwoiCOmJ6iQ4/EI4b6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggjnRDdL9fJxc8ck9wRc9KXwVZLnDQUSv/2Ly0fwo4PKqiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggOhWLvkXhVN9cZwk4enCOWt/GX+E+xjHOV+O0OGN5oX50Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQHOn6Cz7CO7B3tN5vMLAX3gaUMlFZz1vaHdAg8UkI78RnKgtS61ZnJELMhyr1/6jmpe3GUNdP3aRXJpzU6T+5nk=</c2pa:manifest></metadata></svg>
+  </header>
+
+  <main class="onskeliste">
+    <p class="intro">Trykk på en lapp for å se hvor du finner ønsket.</p>
+
+    <!-- =====================================================
+         ØNSKENE DINE STARTER HER
+         ===================================================== -->
+    <ul class="onsker">
+
+      <!--
+        ÉTT ØNSKE = alt fra <li class="onske"> til </li>.
+        Slik endrer du et ønske:
+          1. Bytt https://example.com med lenken til ønsket.
+          2. Bytt teksten i "lapp-tittel" og "lapp-tekst".
+        Vil du ha flere ønsker? Kopier en hel blokk og lim den inn under.
+        Fargene (rød, grønn, gul) bytter seg automatisk.
+      -->
+
+      <!-- ØNSKE 1 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Lorem ipsum dolor</span>
+          <span class="lapp-tekst">Sit amet, consectetur adipiscing elit.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+      <!-- ØNSKE 2 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Consectetur adipiscing</span>
+          <span class="lapp-tekst">Sed do eiusmod tempor incididunt ut labore.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+      <!-- ØNSKE 3 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Sed do eiusmod</span>
+          <span class="lapp-tekst">Ut enim ad minim veniam, quis nostrud.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+      <!-- ØNSKE 4 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Tempor incididunt</span>
+          <span class="lapp-tekst">Duis aute irure dolor in reprehenderit.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+      <!-- ØNSKE 5 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Ut labore et dolore</span>
+          <span class="lapp-tekst">Excepteur sint occaecat cupidatat non proident.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+      <!-- ØNSKE 6 -->
+      <li class="onske">
+        <a class="lapp" href="https://example.com" target="_blank" rel="noopener">
+          <span class="lapp-tittel">Magna aliqua</span>
+          <span class="lapp-tekst">Sunt in culpa qui officia deserunt mollit.</span>
+          <span class="lapp-lenke">Se ønsket<span class="skjult"> (åpnes i ny fane)</span></span>
+        </a>
+      </li>
+
+    </ul>
+    <!-- =====================================================
+         ØNSKENE DINE SLUTTER HER
+         ===================================================== -->
+  </main>
+
+  <footer class="bunn">
+    <!-- ENDRE: hilsen nederst -->
+    <p class="bunn-hilsen">God jul!</p>
+  </footer>
+
+  <script>
+    /* =========================================================
+       Snøfall i headeren.
+       Tegnes på et <canvas> (en «tegneflate» i nettleseren).
+       Har brukeren slått på «redusert bevegelse», står snøen stille.
+       ========================================================= */
+
+    (function () {
+      const lerret = document.querySelector(".sno");
+      if (!lerret || !lerret.getContext) return;
+
+      const ctx = lerret.getContext("2d");
+      const rolig = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      let bredde = 0;
+      let hoyde = 0;
+      let fnugg = [];
+      let animId = null;
+      let forrigeTid = 0;
+
+      function nyttFnugg() {
+        return {
+          x: Math.random() * bredde,
+          y: Math.random() * hoyde,
+          r: 1 + Math.random() * 2.6,              // størrelse
+          fart: 0.35 + Math.random() * 0.9,        // hvor fort det faller
+          svai: Math.random() * Math.PI * 2,
+          svaiFart: 0.004 + Math.random() * 0.01,
+          alfa: 0.5 + Math.random() * 0.5          // hvor gjennomsiktig
+        };
+      }
+
+      function tilpassStorrelse() {
+        const boks = lerret.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        bredde = boks.width;
+        hoyde = boks.height;
+        lerret.width = Math.round(bredde * dpr);
+        lerret.height = Math.round(hoyde * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Færre fnugg på små skjermer
+        const antall = Math.round(Math.min(220, (bredde * hoyde) / 5000));
+        fnugg = Array.from({ length: antall }, nyttFnugg);
+      }
+
+      function tegn() {
+        ctx.clearRect(0, 0, bredde, hoyde);
+        ctx.fillStyle = "#ffffff";
+        for (const f of fnugg) {
+          ctx.globalAlpha = f.alfa;
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      function flytt(steg) {
+        for (const f of fnugg) {
+          f.svai += f.svaiFart * steg;
+          f.y += f.fart * steg;
+          f.x += Math.sin(f.svai) * 0.4 * steg;
+
+          if (f.y > hoyde + 5) {
+            f.y = -5;
+            f.x = Math.random() * bredde;
+          }
+          if (f.x > bredde + 5) f.x = -5;
+          else if (f.x < -5) f.x = bredde + 5;
+        }
+      }
+
+      function loop(tid) {
+        // Samme fart på skjermer som oppdaterer 60 og 120 ganger i sekundet
+        const steg = forrigeTid ? Math.min((tid - forrigeTid) / 16.67, 3) : 1;
+        forrigeTid = tid;
+        flytt(steg);
+        tegn();
+        animId = requestAnimationFrame(loop);
+      }
+
+      function stopp() {
+        if (animId) cancelAnimationFrame(animId);
+        animId = null;
+        forrigeTid = 0;
+      }
+
+      function start() {
+        stopp();
+        tilpassStorrelse();
+        if (rolig.matches) {
+          tegn();
+        } else {
+          animId = requestAnimationFrame(loop);
+        }
+      }
+
+      // Start på nytt hvis headeren endrer størrelse (f.eks. når mobilen snus)
+      let sistBredde = 0;
+      let sistHoyde = 0;
+      let timer = null;
+      function vedEndring() {
+        const boks = lerret.getBoundingClientRect();
+        if (Math.abs(boks.width - sistBredde) < 1 && Math.abs(boks.height - sistHoyde) < 1) return;
+        sistBredde = boks.width;
+        sistHoyde = boks.height;
+        clearTimeout(timer);
+        timer = setTimeout(start, 150);
+      }
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(vedEndring).observe(lerret);
+      } else {
+        window.addEventListener("resize", vedEndring);
+      }
+
+      if (rolig.addEventListener) rolig.addEventListener("change", start);
+
+      start();
+    })();
+  </script>
+</body>
+</html>
